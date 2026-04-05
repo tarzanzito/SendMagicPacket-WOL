@@ -1,2 +1,2 @@
-# SendMagicPack
-Send MagicPack to Wakeup On Lan
+# SendMagicPacket
+Send MagicPacket to Wakeup On Lan
