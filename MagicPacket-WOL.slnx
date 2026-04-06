@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="MagicPacketComplex/MagicPacketComplex.csproj" />
+  <Project Path="MagicPacketSimple/MagicPacketSimple.csproj" />
+  <Project Path="SSHWinForms/SSHWinForms.csproj" Id="49d7c166-c86b-4e1e-8008-4a2c7cd7a044" />
+</Solution>

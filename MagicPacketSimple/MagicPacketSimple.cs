@@ -1,66 +1,55 @@
-﻿using Org.BouncyCastle.Utilities;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Net;
-using System.Net.Mail;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
-using System.Reflection.Emit;
-using System.Reflection.PortableExecutable;
 using System.Text.RegularExpressions;
+
 
 namespace WakeOnLan
 {
-    //private enum SendMethod
-    //{
-    //    Broadcast = "255.255.255.255",
-    //    Multicast = "224.1.1.1", // All-Systems, All-Hosts
-    //    Loopback = "127.0.0.1" //localhost
-    //    Gateway = "192.168.1.1",
-    //    LocalBroadcast = "192.168.1.255",
-    //    TargetAddress = String.Empty,
-    //}
-
     public static class MagicPacketSimple
     {
-        public const string DefaultBroadcastIp = "255.255.255.255"; //Broadcast
-        public const string DefaulMulticastIp = "224.0.0.1"; // Multicast, All-Systems, All-Hosts
-        //public const string DefaultLoopbackIp = "127.0.0.1";  // localhost
-        //public const string DefaultGatewayIp = "192.168.1.1"; // common default gateway for home networks, but may vary
-        //public const string DefaultLocalBroadcastIp = "192.168.1.255"; // local Broadcast
-        //public const string DefaultAnyIp = "0.0.0.0";
+        #region public const
 
+        public const string DefaultBroadcastIp = "255.255.255.255";    // Common Broadcast
+        public const string DefaulMulticastIp = "224.0.0.1";           // Multicast, All-Systems, All-Hosts
+        public const string DefaultLoopbackIp = "127.0.0.1";           // Common localhost
+        public const string DefaultGatewayIp = "192.168.1.1";          // Common gateway for home networks
+        public const string DefaultLocalBroadcastIp = "192.168.1.255"; // Common local Broadcast
+        public const string DefaultAnyIp = "0.0.0.0";
 
-        public static void SendBroadcast(string macAddress, int port = 9)
+        #endregion
+
+        #region public static methods
+
+        public static void SendToBroadcast(string macAddress, int port = 9)
         {
-            SendToTarget(macAddress, "255.255.255.255", port); // Broadcast
+            SendToTarget(macAddress, DefaultBroadcastIp, port); // Broadcast
         }
 
-        public static void SendLocalBroadcast(string macAddress, int port = 9)
+        public static void SendToLocalBroadcast(string macAddress, int port = 9)
         {
-            SendToTarget(macAddress, "192.168.1.255", port);  // local Broadcast
+            SendToTarget(macAddress, DefaultLocalBroadcastIp, port);  // local Broadcast
         }
 
-        public static void SendMulticast(string macAddress, int port = 9)
+        public static void SendToMulticast(string macAddress, int port = 9)
         {
-            SendToTarget(macAddress, "224.0.0.1", port); // Multicast, All-Systems, All-Hosts
+            SendToTarget(macAddress, DefaulMulticastIp, port); // Multicast, All-Systems, All-Hosts
         }
 
-        public static void SendLoopback(string macAddress, int port = 9)
+        public static void SendToLoopback(string macAddress, int port = 9)
         {
-            SendToTarget(macAddress, "127.0.0.1", port); // Loopback
+            SendToTarget(macAddress, DefaultLoopbackIp, port); // Loopback
         }
 
-        public static void SendGateway(string macAddress, int port = 9)
+        public static void SendToGateway(string macAddress, int port = 9)
         {
-            SendToTarget(macAddress, "192.168.1.1", port);
+            SendToTarget(macAddress, DefaultGatewayIp, port);
         }
 
         public static void SendToAny(string macAddress, int port = 9)
         {
             //ERROR: System.Net.Sockets.SocketException: 'The requested address is not valid in its context.'
-            SendToTarget(macAddress, "0.0.0.0", port); //any
+            SendToTarget(macAddress, DefaultAnyIp, port); //any
         }
 
         public static void SendToTarget(string macAddress, string targetIp, int port = 9)
@@ -71,11 +60,14 @@ namespace WakeOnLan
             SendWakeOnLan(ipAddress, port, magicPacket);
         }
 
+        #endregion
+
+        #region private static methods top
 
         private static void SendWakeOnLan(IPAddress ipAddress, int port, byte[] magicPacket)
         {
             using UdpClient client = new UdpClient();
-            //client.EnableBroadcast = true;  // for me witn 'false' works too
+            //client.EnableBroadcast = true;  //NOTE: for me witn 'false' works too
 
             IPEndPoint endPoint = new IPEndPoint(ipAddress, port);
             client.Send(magicPacket, magicPacket.Length, endPoint);
@@ -91,25 +83,15 @@ namespace WakeOnLan
             sock.Send(magicPacket, 0, magicPacket.Length, SocketFlags.None);
         }
 
-        private static string GetCleanMacAddress(string macAddress)
-        {
-            ValidateMacAddress(macAddress);
-
-            //or
-
-            if (macAddress.Length != 12)
-                throw new ArgumentException($"Invalid MAC address length. [{macAddress}]");
-
-            string cleanMacAddress = CleanMacAddress(macAddress, true);
-            
-            ValidadeLettersAndNumbers(cleanMacAddress, true);
-
-            return cleanMacAddress;
-        }
-
         private static byte[] BuildMagicPacket(string macAddress)
         {
-            string cleanMacAddress = GetCleanMacAddress(macAddress);
+            string upperMacAddress = macAddress.ToUpper();
+
+#if USE_REG_EX
+            string cleanMacAddress = GetCleanMacAddressRegEx(upperMacAddress);
+#else
+            string cleanMacAddress = GetCleanMacAddress(upperMacAddress);
+#endif
 
             //Magic Packet Structure:
             byte[] dataArray = new byte[102];
@@ -133,72 +115,113 @@ namespace WakeOnLan
             return dataArray;
         }
 
+#endregion
 
-        private static void ValidateMacAddress(string macAddress)
+        #region private static methods NO regex
+
+        private static string GetCleanMacAddress(string macAddress)
         {
-            if (macAddress.Length != 12)
-                throw new ArgumentException($"Invalid MAC address length. [{macAddress}]");
+            string cleanMacAddress = CleanMacAddress(macAddress);
 
-            //validate MAC address like "01:23:45:67:89:AB" or "01-23-45-67-89-AB"
+            ValidateMacAddress(macAddress, true);
 
-            //I don't like Regex !!! :( 
-            bool isValid = Regex.IsMatch(macAddress, "^([0-9A-F]{2}[:-]){5}([0-9A-F]{2})$");
-
-            if (!isValid)
-                throw new ArgumentException($"Invalid MAC address format. [{macAddress}]");
+            return cleanMacAddress;
         }
 
-        private static string CleanMacAddress(string macAddress, bool toUppercase)
+        private static string CleanMacAddress(string macAddress)
         {
             //remove all ':', '-', ' ' and convert to uppercase
-
-            if (toUppercase)
-                return macAddress.Replace(":", "").Replace("-", "").Replace(" ", "").ToUpper();
-            else
-                return macAddress.Replace(":", "").Replace("-", "").Replace(" ", "");
-
-            //I don't like Regex !!! :(
-            //if (toUppercase)
-            //    return Regex.Replace(macAddress, "[: -]", "").ToUpper(); //TODO: optimize ToUpper
-            //else
-            //    return Regex.Replace(macAddress, "[: -]", "");
+            return macAddress.Replace(":", "").Replace("-", "").Replace(" ", "");
         }
 
-        private static void ValidadeLettersAndNumbers(string data, bool uppercase)
+        private static void ValidateMacAddress(string macAddress, bool uppercase)
         {
-           // if (macAddress.Length != 12) //tirar daqui
-           //     throw new ArgumentException($"Invalid MAC address length. [{macAddress}]");
+            string macAddressTemp;
 
-            bool isValid = false;
+            if (macAddress.Length == 17)
+                macAddressTemp = CleanMacAddress(macAddress);
+            else
+                macAddressTemp = macAddress;
+
+            if (macAddressTemp.Length != 12)
+                throw new ArgumentException($"Invalid MAC address length. [{macAddress}]");
+
+            bool isValid = IsOnlyLettersAndNumbers(macAddress, uppercase);
+
+            if (!isValid)
+                throw new ArgumentException($"MAC address must have only letters (Upper) and numbers. [{macAddress}]");
+        }
+
+        private static bool IsOnlyLettersAndNumbers(string data, bool uppercase)
+        {
 
             if (uppercase)
             {
                 //Checks if the string contains only uppercase letters and numbers
-                isValid = data.All(c => (Char.IsLetter(c) && Char.IsUpper(c)) || Char.IsDigit(c));
+                return data.All(c => (Char.IsLetter(c) && Char.IsUpper(c)) || Char.IsDigit(c));
             }
             else
             {
                 //Checks if the string contains only letters and numbers.
-                isValid = data.All(c => Char.IsLetter(c) || Char.IsDigit(c));
+                return data.All(c => Char.IsLetter(c) || Char.IsDigit(c));
             }
-
-            //I don't like Regex !!! :( 
-            //if (uppercase)
-            //{
-            //    //Checks if the string contains only uppercase letters and numbers
-            //    isValid = Regex.IsMatch(data, @"^[A-Z0-9]+$");
-            //}
-            //else
-            //{
-            //    //Checks if the string contains only letters and numbers.
-            //    isValid = Regex.IsMatch(data, @"^[a-zA-Z0-9]+$");
-            //}
-
-            if (!isValid)
-                throw new ArgumentException($"String content must have only letters and numbers. [{data}]");
-
         }
 
+        #endregion
+
+        #region private static methods REGEX
+
+        private static string GetCleanMacAddressRegEx(string macAddress)
+        {
+            string cleanMacAddress = CleanMacAddressRegEx(macAddress);
+
+            ValidateMacAddressRegex(cleanMacAddress, true);
+
+            return cleanMacAddress;
+        }
+
+        private static string CleanMacAddressRegEx(string macAddress)
+        {
+            //remove all ':', '-', ' ' and convert to uppercase
+
+            //I don't like Regex !!! :(
+            return Regex.Replace(macAddress, "[: -]", "");
+        }
+
+        private static void ValidateMacAddressRegex(string macAddress, bool uppercase)
+        {
+            string macAddressTemp;
+
+            if (macAddress.Length == 17)
+                macAddressTemp = CleanMacAddressRegEx(macAddress);
+            else
+                macAddressTemp = macAddress;
+
+            if (macAddressTemp.Length != 12)
+                throw new ArgumentException($"Invalid MAC address length. [{macAddress}]");
+
+            bool isValid = IsOnlyLettersAndNumbersEx(macAddressTemp, uppercase);
+
+            if (!isValid)
+                throw new ArgumentException($"MAC address must have only letters (Upper) and numbers. [{macAddress}]");
+        }
+
+        private static bool IsOnlyLettersAndNumbersEx(string data, bool uppercase)
+        {
+            //I don't like Regex !!! :( 
+            if (uppercase)
+            {
+                //Checks if the string contains only uppercase letters and numbers
+                return Regex.IsMatch(data, @"^[A-Z0-9]+$");
+            }
+            else
+            {
+                //Checks if the string contains only letters and numbers.
+                return Regex.IsMatch(data, @"^[a-zA-Z0-9]+$");
+            }
+        }
+
+        #endregion
 
     }
 }

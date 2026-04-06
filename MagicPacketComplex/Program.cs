@@ -4,10 +4,10 @@ using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Timers;
 
-//namespace ConsoleApp1
-//{
-//    internal class ProgramB
-//    {
+namespace ConsoleApp1
+{
+    internal class ProgramB
+    {
 
 //        private static readonly string[] MAGIC_PACKET = new string[17]
 //{
@@ -32,8 +32,8 @@ using System.Timers;
 
 //        private static readonly string BROADCAST_IP = "BROADCAST IP";
 
-//        static void Main(string[] args)
-//        {
+        static void Main(string[] args)
+        {
 //            Console.WriteLine($"Your broadcast IP: {IPAddress.Parse(BROADCAST_IP)}");
 //            Console.WriteLine($"The MAC address to wake up is: {MAGIC_PACKET[1]}");
 //            Console.WriteLine(string.Empty);
@@ -145,6 +145,6 @@ using System.Timers;
 
 //                device.PcapClose();
 //            }
-//        }
-//    }
-//}
+        }
+    }
+}
