@@ -146,7 +146,7 @@ namespace WakeOnLan
             if (macAddressTemp.Length != 12)
                 throw new ArgumentException($"Invalid MAC address length. [{macAddress}]");
 
-            bool isValid = IsOnlyLettersAndNumbers(macAddress, uppercase);
+            bool isValid = IsOnlyLettersAndNumbers(macAddressTemp, uppercase);
 
             if (!isValid)
                 throw new ArgumentException($"MAC address must have only letters (Upper) and numbers. [{macAddress}]");
