@@ -1,5 +1,4 @@
 using System;
-using System.Reflection.Metadata.Ecma335;
 using System.Windows.Forms;
 
 namespace MagicPacketWinform
@@ -18,7 +17,7 @@ namespace MagicPacketWinform
             Multicast,
             Loopback,
             Gateway,
-            Local_Broadcast,
+            LocalBroadcast,
             Any
         }
 

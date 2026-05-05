@@ -68,11 +68,19 @@ namespace WakeOnLan
 
         private static void SendWakeOnLan(IPAddress ipAddress, int port, byte[] magicPacket)
         {
-            using UdpClient client = new UdpClient();
+            using (UdpClient client = new UdpClient())
+            {
+                //client.EnableBroadcast = true;  //NOTE: for me witn 'false' works too
+                IPEndPoint endPoint = new IPEndPoint(ipAddress, port);
+                client.Send(magicPacket, magicPacket.Length, endPoint);
+            }
+
+            //DotNet 8 or greater
+            //using UdpClient client = new UdpClient();
             //client.EnableBroadcast = true;  //NOTE: for me witn 'false' works too
 
-            IPEndPoint endPoint = new IPEndPoint(ipAddress, port);
-            client.Send(magicPacket, magicPacket.Length, endPoint);
+            //IPEndPoint endPoint = new IPEndPoint(ipAddress, port);
+            //client.Send(magicPacket, magicPacket.Length, endPoint);
         }
 
         //not tested yet

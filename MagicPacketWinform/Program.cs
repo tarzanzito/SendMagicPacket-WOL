@@ -11,9 +11,13 @@ namespace MagicPacketWinform
         [STAThread]
         static void Main()
         {
-            // To customize application configuration such as set high DPI settings or default font,
-            // see https://aka.ms/applicationconfiguration.
-            ApplicationConfiguration.Initialize();
+            //DotNet Framework
+            Application.EnableVisualStyles();
+            Application.SetCompatibleTextRenderingDefault(false);
+
+            //DotNet 5.0 or later
+            //ApplicationConfiguration.Initialize();
+
             Application.Run(new Form1());
         }
     }
