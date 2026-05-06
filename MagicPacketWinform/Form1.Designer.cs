@@ -44,7 +44,7 @@ namespace MagicPacketWinform
             this.label3 = new System.Windows.Forms.Label();
             this.comboBoxMethod = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
-            this.buttonQnapWakeOnLan = new System.Windows.Forms.Button();
+            this.buttonWakeOnLan = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.label1 = new System.Windows.Forms.Label();
             this.textBoxPublicIP = new System.Windows.Forms.TextBox();
@@ -67,7 +67,8 @@ namespace MagicPacketWinform
             this.buttonQnapWakeOnLanRemote.TabIndex = 1;
             this.buttonQnapWakeOnLanRemote.Text = "Wake On Web (Remote)";
             this.buttonQnapWakeOnLanRemote.UseVisualStyleBackColor = true;
-            // 
+            this.buttonQnapWakeOnLanRemote.Click += new System.EventHandler(this.buttonWakeOnLanRemote_Click);
+            //
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.textBoxTargetIp);
@@ -80,7 +81,7 @@ namespace MagicPacketWinform
             this.groupBox1.Controls.Add(this.label3);
             this.groupBox1.Controls.Add(this.comboBoxMethod);
             this.groupBox1.Controls.Add(this.label2);
-            this.groupBox1.Controls.Add(this.buttonQnapWakeOnLan);
+            this.groupBox1.Controls.Add(this.buttonWakeOnLan);
             this.groupBox1.Location = new System.Drawing.Point(10, 13);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(207, 191);
@@ -145,8 +146,9 @@ namespace MagicPacketWinform
             this.comboBoxName.FormattingEnabled = true;
             this.comboBoxName.Location = new System.Drawing.Point(81, 19);
             this.comboBoxName.Name = "comboBoxName";
-            this.comboBoxName.Size = new System.Drawing.Size(58, 21);
+            this.comboBoxName.Size = new System.Drawing.Size(77, 21);
             this.comboBoxName.TabIndex = 6;
+            this.comboBoxName.SelectedIndexChanged += new System.EventHandler(this.comboBoxName_SelectedIndexChanged);
             // 
             // label3
             // 
@@ -172,6 +174,7 @@ namespace MagicPacketWinform
             this.comboBoxMethod.Name = "comboBoxMethod";
             this.comboBoxMethod.Size = new System.Drawing.Size(112, 21);
             this.comboBoxMethod.TabIndex = 4;
+            this.comboBoxMethod.SelectedIndexChanged += new System.EventHandler(this.comboBoxMethod_SelectedIndexChanged);
             // 
             // label2
             // 
@@ -182,14 +185,15 @@ namespace MagicPacketWinform
             this.label2.TabIndex = 3;
             this.label2.Text = "Method:";
             // 
-            // buttonQnapWakeOnLan
+            // buttonWakeOnLan
             // 
-            this.buttonQnapWakeOnLan.Location = new System.Drawing.Point(95, 147);
-            this.buttonQnapWakeOnLan.Name = "buttonQnapWakeOnLan";
-            this.buttonQnapWakeOnLan.Size = new System.Drawing.Size(97, 29);
-            this.buttonQnapWakeOnLan.TabIndex = 0;
-            this.buttonQnapWakeOnLan.Text = "Wake On Lan";
-            this.buttonQnapWakeOnLan.UseVisualStyleBackColor = true;
+            this.buttonWakeOnLan.Location = new System.Drawing.Point(95, 147);
+            this.buttonWakeOnLan.Name = "buttonWakeOnLan";
+            this.buttonWakeOnLan.Size = new System.Drawing.Size(97, 29);
+            this.buttonWakeOnLan.TabIndex = 0;
+            this.buttonWakeOnLan.Text = "Wake On Lan";
+            this.buttonWakeOnLan.UseVisualStyleBackColor = true;
+            this.buttonWakeOnLan.Click += new System.EventHandler(this.buttonWakeOnLan_Click);
             // 
             // groupBox2
             // 
@@ -280,6 +284,7 @@ namespace MagicPacketWinform
             this.buttonClose.TabIndex = 6;
             this.buttonClose.Text = "Close";
             this.buttonClose.UseVisualStyleBackColor = true;
+            this.buttonClose.Click += new System.EventHandler(this.buttonClose_Click);
             // 
             // Form1
             // 
@@ -323,7 +328,6 @@ namespace MagicPacketWinform
         private Label label2;
         private GroupBox groupBox3;
         private LinkLabel linkLabel4;
-        private Button buttonQnapWakeOnLan;
         private ComboBox comboBoxName;
         private Label label3;
         private TextBox textBoxMacAddress;

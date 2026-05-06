@@ -76,7 +76,20 @@ namespace MagicPacketWinform
             }
         }
 
-        private void comboBoxId_SelectedIndexChanged(object sender, EventArgs e)
+        private void buttonWakeOnLanRemote_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                //MessageBox.Show("Magic packet sent successfully!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error sending magic packet: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+
+        private void comboBoxName_SelectedIndexChanged(object sender, EventArgs e)
         {
             try
             {
@@ -187,7 +200,6 @@ namespace MagicPacketWinform
 
             RefreshFormMethod();
         }
-
 
     }
 }
